@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from telegram.ext import Application, CommandHandler
 from bot.config import API_TOKEN
-from bot.handlers.user_handlers import user_command_handlers
+from bot.handlers.user_handlers import user_command_handlers, subir_archivo
 from bot.handlers.admin_handlers import admin_command_handlers
 
 async def start(update, context):
@@ -26,6 +26,9 @@ def main():
 
     # Agrega el comando /start
     application.add_handler(CommandHandler("start", start))
+
+    # Agrega el comando /subir_archivo
+    application.add_handler(CommandHandler("subir_archivo", subir_archivo))
 
     # Registra los handlers de usuario
     for handler in user_command_handlers:
