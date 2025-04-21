@@ -1,20 +1,23 @@
 from telegram import Update
 from telegram.ext import CommandHandler, CallbackContext
+from bot.config import DATABASE_PATH, FILE_STORAGE_PATH
 from bot.services.user_management_service import UserManagementService
 from bot.services.coupon_service import CouponService
 from bot.services.file_upload_service import FileUploadService
-from bot.config import DATABASE_PATH
 
 # Instancia del servicio con la base de datos
 user_management_service = UserManagementService(database=DATABASE_PATH)
+
+# Instancia del servicio de cupones
+coupon_service = CouponService()
+
+# Instancia del servicio de subida de archivos
+file_upload_service = FileUploadService(upload_directory=FILE_STORAGE_PATH)
 
 # Define tus handlers aquí
 user_command_handlers = [
     # Agrega tus handlers de comandos aquí
 ]
-
-coupon_service = CouponService()
-file_upload_service = FileUploadService()
 
 def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Welcome to the Digital Content Store! Use /subir_archivo to upload files, /redimir_cupon to redeem coupons, and /mis_archivos to view your files.")
