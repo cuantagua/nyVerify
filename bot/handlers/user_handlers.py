@@ -3,8 +3,16 @@ from telegram.ext import CommandHandler, CallbackContext
 from bot.services.user_management_service import UserManagementService
 from bot.services.coupon_service import CouponService
 from bot.services.file_upload_service import FileUploadService
+from bot.config import DATABASE_PATH
 
-user_management_service = UserManagementService()
+# Instancia del servicio con la base de datos
+user_management_service = UserManagementService(database=DATABASE_PATH)
+
+# Define tus handlers aquí
+user_command_handlers = [
+    # Agrega tus handlers de comandos aquí
+]
+
 coupon_service = CouponService()
 file_upload_service = FileUploadService()
 
