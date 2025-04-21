@@ -1,12 +1,19 @@
 from telegram import Update
 from telegram.ext import CommandHandler, CallbackContext
-from services.file_upload_service import FileUploadService
+from bot.config import FILE_STORAGE_PATH
+from bot.services.file_upload_service import FileUploadService
 from services.coupon_service import CouponService
 from services.user_management_service import UserManagementService
 
-file_upload_service = FileUploadService()
+# Instancia del servicio de subida de archivos
+file_upload_service = FileUploadService(upload_directory=FILE_STORAGE_PATH)
 coupon_service = CouponService()
 user_management_service = UserManagementService()
+
+# Define tus handlers aquí
+admin_command_handlers = [
+    # Agrega tus handlers de comandos aquí
+]
 
 def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('Welcome to the Admin Panel! Use /upload_file to upload files or /generate_coupon to create coupons.')
