@@ -1,37 +1,23 @@
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
-from handlers.file_upload import handle_file_upload
-from handlers.coupon_generation import generate_coupon
-from handlers.user_management import register_user, get_user_info
-import logging
-import config
+from telegram.ext import Updater, CommandHandler, CallbackContext
+from bot.config import TOKEN
+from bot.handlers.user_handlers import user_command_handlers
+from bot.handlers.admin_handlers import admin_command_handlers
 
-# Configuración del registro de logs
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-
-def inicio(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text('🎉 ¡Bienvenido al Bot de Venta de Contenido Digital!')
-
-def principal() -> None:
-    # Crear el Updater y pasarle el token del bot.
-    updater = Updater(config.BOT_TOKEN)
-
-    # Obtener el dispatcher para registrar los manejadores
+def main():
+    updater = Updater(TOKEN, use_context=True)
     dispatcher = updater.dispatcher
 
-    # Registrar manejadores de comandos
-    dispatcher.add_handler(CommandHandler("inicio", inicio))
-    dispatcher.add_handler(CommandHandler("registrar", register_user))
-    dispatcher.add_handler(CommandHandler("cupon", generate_coupon))
-    
-    # Registrar manejador de mensajes para la subida de archivos
-    dispatcher.add_handler(MessageHandler(Filters.document, handle_file_upload))
+    # Register user command handlers
+    for handler in user_command_handlers:
+        dispatcher.add_handler(handler)
 
-    # Iniciar el bot
+    # Register admin command handlers
+    for handler in admin_command_handlers:
+        dispatcher.add_handler(handler)
+
     updater.start_polling()
-
-    # Ejecutar el bot hasta que se envíe una señal para detenerlo
     updater.idle()
 
 if __name__ == '__main__':
-    principal()
+    main()
