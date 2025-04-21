@@ -1,0 +1,5 @@
+API_TOKEN = "YOUR_API_TOKEN_HERE"
+ADMIN_CHAT_ID = "YOUR_ADMIN_CHAT_ID_HERE"
+COUPON_FORMAT = "COUPON-{id}-{timestamp}"
+FILE_STORAGE_PATH = "path/to/store/files"
+DATABASE_PATH = "path/to/database.csv"
