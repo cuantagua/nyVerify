@@ -4,6 +4,7 @@ from bot.config import FILE_STORAGE_PATH, DATABASE_PATH
 from bot.services.file_upload_service import FileUploadService
 from bot.services.coupon_service import CouponService
 from bot.services.user_management_service import UserManagementService
+from telegram.ext import ContextTypes
 
 # Instancia del servicio de subida de archivos
 file_upload_service = FileUploadService(upload_directory=FILE_STORAGE_PATH)
@@ -18,22 +19,24 @@ user_management_service = UserManagementService(database=DATABASE_PATH)
 admin_command_handlers = [
     # Agrega tus handlers de comandos aquí
 ]
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text('👋 ¡Bienvenido al Panel de Administración! Usa /upload_file para subir archivos o /generate_coupon para crear cupones.')
 
-def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text('Welcome to the Admin Panel! Use /upload_file to upload files or /generate_coupon to create coupons.')
-
-def upload_file(update: Update, context: CallbackContext) -> None:
+async def upload_file(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if context.args:
         file_path = context.args[0]
-        result = file_upload_service.upload_file(file_path)
-        update.message.reply_text(result)
+        result = await file_upload_service.upload_file(file_path)
+        await update.message.reply_text(f'📂 Resultado de la subida: {result}')
     else:
-        update.message.reply_text('Please provide a file path.')
+        await update.message.reply_text('⚠️ Por favor, proporciona una ruta de archivo.')
 
-def generate_coupon(update: Update, context: CallbackContext) -> None:
-    coupon = coupon_service.generate_coupon()
-    update.message.reply_text(f'Generated Coupon: {coupon}')
+async def generate_coupon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    coupon = await coupon_service.generate_coupon()
+    await update.message.reply_text(f'🎟️ Cupón generado: {coupon}')
 
-def list_users(update: Update, context: CallbackContext) -> None:
-    users = user_management_service.get_all_users()
-    update.message.reply_text('\n'.join(users))
+async def list_users(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    users = await user_management_service.get_all_users()
+    if users:
+        await update.message.reply_text(f'👥 Lista de usuarios:\n' + '\n'.join(users))
+    else:
+        await update.message.reply_text('⚠️ No hay usuarios registrados.')

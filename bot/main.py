@@ -9,7 +9,7 @@ from bot.config import API_TOKEN
 from bot.handlers.user_handlers import user_command_handlers
 from bot.handlers.admin_handlers import admin_command_handlers
 
-def start(update, context):
+async def start(update, context):
     """Muestra las opciones disponibles al usuario."""
     options = (
         "👋 ¡Hola! Estas son las opciones disponibles:\n"
@@ -18,7 +18,7 @@ def start(update, context):
         "/mis_archivos - Ver tus archivos\n"
         "/comprar - Comprar más cupones\n"
     )
-    update.message.reply_text(options)
+    await update.message.reply_text(options)
 
 def main():
     # Crea la aplicación

@@ -19,27 +19,29 @@ user_command_handlers = [
     # Agrega tus handlers de comandos aquí
 ]
 
-def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text("Welcome to the Digital Content Store! Use /subir_archivo to upload files, /redimir_cupon to redeem coupons, and /mis_archivos to view your files.")
+async def start(update: Update, context: CallbackContext) -> None:
+    await update.message.reply_text(
+        "👋 ¡Bienvenido a la Tienda de Contenidos Digitales! Usa /subir_archivo para subir archivos, /redimir_cupon para redimir cupones y /mis_archivos para ver tus archivos."
+    )
 
-def subir_archivo(update: Update, context: CallbackContext) -> None:
-    # Logic for handling file uploads
-    update.message.reply_text("Please send the file you want to upload.")
+async def subir_archivo(update: Update, context: CallbackContext) -> None:
+    # Lógica para manejar la subida de archivos
+    await update.message.reply_text("📤 Por favor, envía el archivo que deseas subir.")
 
-def redimir_cupon(update: Update, context: CallbackContext) -> None:
-    # Logic for redeeming coupons
+async def redimir_cupon(update: Update, context: CallbackContext) -> None:
+    # Lógica para redimir cupones
     coupon_code = context.args[0] if context.args else None
     if coupon_code:
-        result = coupon_service.redeem_coupon(coupon_code)
-        update.message.reply_text(result)
+        result = await coupon_service.redeem_coupon(coupon_code)
+        await update.message.reply_text(f"🎟️ {result}")
     else:
-        update.message.reply_text("Please provide a coupon code.")
+        await update.message.reply_text("❌ Por favor, proporciona un código de cupón.")
 
-def mis_archivos(update: Update, context: CallbackContext) -> None:
-    # Logic for listing user's files
+async def mis_archivos(update: Update, context: CallbackContext) -> None:
+    # Lógica para listar los archivos del usuario
     user_id = update.message.from_user.id
-    files = user_management_service.get_user_files(user_id)
+    files = await user_management_service.get_user_files(user_id)
     if files:
-        update.message.reply_text("Your files:\n" + "\n".join(files))
+        await update.message.reply_text("📂 Tus archivos:\n" + "\n".join(files))
     else:
-        update.message.reply_text("You have no uploaded files.")
+        await update.message.reply_text("📂 No tienes archivos subidos.")
