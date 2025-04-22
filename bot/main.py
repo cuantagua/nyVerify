@@ -38,6 +38,9 @@ def main():
     for handler in admin_command_handlers:
         application.add_handler(handler)
 
+    # Agrega el handler para la conversación de subida de archivos
+    application.add_handler(file_upload_conversation)
+
     # Mensaje en consola para indicar que el bot está encendido
     print("✅ El bot está encendido y funcionando...")
 

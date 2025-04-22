@@ -1,5 +1,5 @@
-from telegram import Update
-from telegram.ext import CommandHandler, CallbackContext, MessageHandler, filters
+from telegram import Update, ReplyKeyboardMarkup
+from telegram.ext import CommandHandler, CallbackContext, MessageHandler, filters, ConversationHandler
 from bot.config import DATABASE_PATH, FILE_STORAGE_PATH
 from bot.services.user_management_service import UserManagementService
 from bot.services.coupon_service import CouponService
@@ -16,8 +16,11 @@ coupon_service = CouponService()
 # Instancia del servicio de subida de archivos
 file_upload_service = FileUploadService(upload_directory=FILE_STORAGE_PATH)
 
+# Estados para el flujo de conversación
+ASK_GENERATE_CODES, ASK_CODE_QUANTITY = range(2)
+
 # Lógica para manejar archivos enviados por el usuario
-async def handle_file_upload(update: Update, context: CallbackContext) -> None:
+async def handle_file_upload(update: Update, context: CallbackContext) -> int:
     """Maneja la recepción de archivos enviados por el usuario."""
     document = update.message.document
     audio = update.message.audio
@@ -27,7 +30,7 @@ async def handle_file_upload(update: Update, context: CallbackContext) -> None:
     # Verifica si el mensaje contiene un archivo reenviado
     if hasattr(update.message, "forward_date") and update.message.forward_date:
         await update.message.reply_text("⚠️ Este archivo fue reenviado. Asegúrate de enviar el archivo original.")
-        return
+        return ConversationHandler.END
 
     # Procesa documentos
     if document:
@@ -55,20 +58,66 @@ async def handle_file_upload(update: Update, context: CallbackContext) -> None:
 
     else:
         await update.message.reply_text("❌ No se pudo procesar el archivo. Por favor, inténtalo de nuevo.")
-        return
+        return ConversationHandler.END
 
     # Guarda el file_id y el nombre del archivo en un archivo CSV
     with open(DATABASE_PATH, mode="a", newline="") as file:
         writer = csv.writer(file)
         writer.writerow([update.message.from_user.id, file_name, file_id, file_type])
 
+    # Guarda el archivo en el contexto para usarlo más adelante
+    context.user_data["file_name"] = file_name
+    context.user_data["file_type"] = file_type
+
     await update.message.reply_text(f"✅ Archivo recibido y almacenado: {file_name} ({file_type})")
 
-# Define tus handlers aquí
-user_command_handlers = [
-    # Handler para cualquier archivo adjunto
-    MessageHandler(filters.ATTACHMENT, handle_file_upload),
-]
+    # Pregunta si desea generar códigos
+    reply_keyboard = [["Sí", "No"]]
+    await update.message.reply_text(
+        "¿Deseas generar códigos para este archivo?",
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+    )
+    return ASK_GENERATE_CODES
+
+async def ask_code_quantity(update: Update, context: CallbackContext) -> int:
+    """Pregunta cuántos códigos desea generar."""
+    user_response = update.message.text
+    if user_response.lower() == "sí":
+        await update.message.reply_text("¿Cuántos códigos deseas generar?")
+        return ASK_CODE_QUANTITY
+    else:
+        await update.message.reply_text("✅ Proceso finalizado. No se generarán códigos.")
+        return ConversationHandler.END
+
+async def generate_codes(update: Update, context: CallbackContext) -> int:
+    """Genera los códigos solicitados."""
+    try:
+        quantity = int(update.message.text)
+        file_name = context.user_data.get("file_name")
+        file_type = context.user_data.get("file_type")
+
+        # Simula la generación de códigos
+        codes = [f"{file_name}_CODE_{i+1}" for i in range(quantity)]
+
+        # Responde con los códigos generados
+        await update.message.reply_text(
+            f"✅ Se generaron {quantity} códigos para el archivo '{file_name}':\n" + "\n".join(codes)
+        )
+    except ValueError:
+        await update.message.reply_text("❌ Por favor, ingresa un número válido.")
+        return ASK_CODE_QUANTITY
+
+    return ConversationHandler.END
+
+# Define el flujo de conversación
+file_upload_conversation = ConversationHandler(
+    entry_points=[MessageHandler(filters.ATTACHMENT, handle_file_upload)],
+    states={
+        ASK_GENERATE_CODES: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_code_quantity)],
+        ASK_CODE_QUANTITY: [MessageHandler(filters.TEXT & ~filters.COMMAND, generate_codes)],
+    },
+    fallbacks=[],
+)
 
 async def start(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text(
