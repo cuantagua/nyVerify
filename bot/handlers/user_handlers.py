@@ -79,22 +79,6 @@ async def handle_file_upload(update: Update, context: CallbackContext) -> int:
     )
     return ASK_GENERATE_CODES
 
-# Define tus handlers aquí
-user_command_handlers = [
-    # Handler para manejar archivos adjuntos
-    MessageHandler(filters.ATTACHMENT, handle_file_upload),
-]
-
-# Define el flujo de conversación para la subida de archivos
-file_upload_conversation = ConversationHandler(
-    entry_points=[MessageHandler(filters.ATTACHMENT, handle_file_upload)],
-    states={
-        ASK_GENERATE_CODES: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_code_quantity)],
-        ASK_CODE_QUANTITY: [MessageHandler(filters.TEXT & ~filters.COMMAND, generate_codes)],
-    },
-    fallbacks=[],
-)
-
 async def ask_code_quantity(update: Update, context: CallbackContext) -> int:
     """Pregunta cuántos códigos desea generar."""
     user_response = update.message.text
@@ -124,6 +108,22 @@ async def generate_codes(update: Update, context: CallbackContext) -> int:
         return ASK_CODE_QUANTITY
 
     return ConversationHandler.END
+
+# Define el flujo de conversación para la subida de archivos
+file_upload_conversation = ConversationHandler(
+    entry_points=[MessageHandler(filters.ATTACHMENT, handle_file_upload)],
+    states={
+        ASK_GENERATE_CODES: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_code_quantity)],
+        ASK_CODE_QUANTITY: [MessageHandler(filters.TEXT & ~filters.COMMAND, generate_codes)],
+    },
+    fallbacks=[],
+)
+
+# Define tus handlers aquí
+user_command_handlers = [
+    # Handler para manejar archivos adjuntos
+    MessageHandler(filters.ATTACHMENT, handle_file_upload),
+]
 
 async def start(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text(
