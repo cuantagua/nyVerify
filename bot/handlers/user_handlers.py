@@ -71,9 +71,9 @@ user_command_handlers = [
     # Handler para audios
     MessageHandler(filters.AUDIO, handle_file_upload),
     # Handler para videos
-    MessageHandler(filters.Video, handle_file_upload),
+    MessageHandler(filters.VIDEO, handle_file_upload),
     # Handler para mensajes de voz
-    MessageHandler(filters.Voice, handle_file_upload),
+    MessageHandler(filters.VOICE, handle_file_upload),
 ]
 
 async def start(update: Update, context: CallbackContext) -> None:
