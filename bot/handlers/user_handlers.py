@@ -66,10 +66,14 @@ async def handle_file_upload(update: Update, context: CallbackContext) -> None:
 
 # Define tus handlers aquí
 user_command_handlers = [
-    MessageHandler(
-        filters.Document | filters.AUDIO | filters.VIDEO | filters.VOICE,
-        handle_file_upload
-    ),
+    # Handler para documentos
+    MessageHandler(filters.Document, handle_file_upload),
+    # Handler para audios
+    MessageHandler(filters.Audio, handle_file_upload),
+    # Handler para videos
+    MessageHandler(filters.Video, handle_file_upload),
+    # Handler para mensajes de voz
+    MessageHandler(filters.Voice, handle_file_upload),
 ]
 
 async def start(update: Update, context: CallbackContext) -> None:
