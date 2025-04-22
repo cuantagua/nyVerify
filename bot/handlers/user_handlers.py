@@ -20,28 +20,53 @@ file_upload_service = FileUploadService(upload_directory=FILE_STORAGE_PATH)
 async def handle_file_upload(update: Update, context: CallbackContext) -> None:
     """Maneja la recepción de archivos enviados por el usuario, incluidos los reenviados."""
     document = update.message.document
+    audio = update.message.audio
+    video = update.message.video
+    voice = update.message.voice
 
     # Verifica si el mensaje contiene un archivo reenviado
     if update.message.forward_date:
         await update.message.reply_text("⚠️ Este archivo fue reenviado. Asegúrate de enviar el archivo original.")
         return
 
+    # Procesa documentos
     if document:
         file_id = document.file_id
         file_name = document.file_name
+        file_type = "Documento"
 
-        # Guarda el file_id y el nombre del archivo en un archivo CSV
-        with open(DATABASE_PATH, mode="a", newline="") as file:
-            writer = csv.writer(file)
-            writer.writerow([update.message.from_user.id, file_name, file_id])
+    # Procesa audios
+    elif audio:
+        file_id = audio.file_id
+        file_name = audio.file_name or "audio.mp3"
+        file_type = "Audio"
 
-        await update.message.reply_text(f"✅ Archivo recibido y almacenado: {file_name}")
+    # Procesa videos
+    elif video:
+        file_id = video.file_id
+        file_name = video.file_name or "video.mp4"
+        file_type = "Video"
+
+    # Procesa mensajes de voz
+    elif voice:
+        file_id = voice.file_id
+        file_name = "voice.ogg"
+        file_type = "Mensaje de voz"
+
     else:
         await update.message.reply_text("❌ No se pudo procesar el archivo. Por favor, inténtalo de nuevo.")
+        return
+
+    # Guarda el file_id y el nombre del archivo en un archivo CSV
+    with open(DATABASE_PATH, mode="a", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow([update.message.from_user.id, file_name, file_id, file_type])
+
+    await update.message.reply_text(f"✅ Archivo recibido y almacenado: {file_name} ({file_type})")
 
 # Define tus handlers aquí
 user_command_handlers = [
-    MessageHandler(filters.DOCUMENT | filters.AUDIO | filters.VIDEO | filters.VOICE, handle_file_upload),
+    MessageHandler(filters.Document.FILE | filters.Audio.FILE | filters.Video.FILE | filters.Voice.FILE, handle_file_upload),
 ]
 
 async def start(update: Update, context: CallbackContext) -> None:
