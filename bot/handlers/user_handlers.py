@@ -18,8 +18,14 @@ file_upload_service = FileUploadService(upload_directory=FILE_STORAGE_PATH)
 
 # Lógica para manejar archivos enviados por el usuario
 async def handle_file_upload(update: Update, context: CallbackContext) -> None:
-    """Maneja la recepción de archivos enviados por el usuario."""
+    """Maneja la recepción de archivos enviados por el usuario, incluidos los reenviados."""
     document = update.message.document
+
+    # Verifica si el mensaje contiene un archivo reenviado
+    if update.message.forward_date:
+        await update.message.reply_text("⚠️ Este archivo fue reenviado. Asegúrate de enviar el archivo original.")
+        return
+
     if document:
         file_id = document.file_id
         file_name = document.file_name
