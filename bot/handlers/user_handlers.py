@@ -16,6 +16,23 @@ coupon_service = CouponService()
 # Instancia del servicio de subida de archivos
 file_upload_service = FileUploadService(upload_directory=FILE_STORAGE_PATH)
 
+# Lógica para manejar archivos enviados por el usuario
+async def handle_file_upload(update: Update, context: CallbackContext) -> None:
+    """Maneja la recepción de archivos enviados por el usuario."""
+    document = update.message.document
+    if document:
+        file_id = document.file_id
+        file_name = document.file_name
+
+        # Guarda el file_id y el nombre del archivo en un archivo CSV
+        with open(DATABASE_PATH, mode="a", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow([update.message.from_user.id, file_name, file_id])
+
+        await update.message.reply_text(f"✅ Archivo recibido y almacenado: {file_name}")
+    else:
+        await update.message.reply_text("❌ No se pudo procesar el archivo. Por favor, inténtalo de nuevo.")
+
 # Define tus handlers aquí
 user_command_handlers = [
     MessageHandler(filters.Document.ALL, handle_file_upload),
@@ -47,20 +64,3 @@ async def mis_archivos(update: Update, context: CallbackContext) -> None:
         await update.message.reply_text("📂 Tus archivos:\n" + "\n".join(files))
     else:
         await update.message.reply_text("📂 No tienes archivos subidos.")
-
-# Lógica para manejar archivos enviados por el usuario
-async def handle_file_upload(update: Update, context: CallbackContext) -> None:
-    """Maneja la recepción de archivos enviados por el usuario."""
-    document = update.message.document
-    if document:
-        file_id = document.file_id
-        file_name = document.file_name
-
-        # Guarda el file_id y el nombre del archivo en un archivo CSV
-        with open(DATABASE_PATH, mode="a", newline="") as file:
-            writer = csv.writer(file)
-            writer.writerow([update.message.from_user.id, file_name, file_id])
-
-        await update.message.reply_text(f"✅ Archivo recibido y almacenado: {file_name}")
-    else:
-        await update.message.reply_text("❌ No se pudo procesar el archivo. Por favor, inténtalo de nuevo.")
