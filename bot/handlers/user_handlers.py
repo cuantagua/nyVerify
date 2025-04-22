@@ -19,6 +19,13 @@ file_upload_service = FileUploadService(upload_directory=FILE_STORAGE_PATH)
 # Estados para el flujo de conversación
 ASK_GENERATE_CODES, ASK_CODE_QUANTITY = range(2)
 
+# Define tus handlers aquí
+user_command_handlers = [
+    # Ejemplo de un handler para manejar archivos adjuntos
+    MessageHandler(filters.ATTACHMENT, handle_file_upload),
+    # Otros handlers pueden ser agregados aquí
+]
+
 # Lógica para manejar archivos enviados por el usuario
 async def handle_file_upload(update: Update, context: CallbackContext) -> int:
     """Maneja la recepción de archivos enviados por el usuario."""
@@ -109,7 +116,7 @@ async def generate_codes(update: Update, context: CallbackContext) -> int:
 
     return ConversationHandler.END
 
-# Define el flujo de conversación
+# Define el flujo de conversación para la subida de archivos
 file_upload_conversation = ConversationHandler(
     entry_points=[MessageHandler(filters.ATTACHMENT, handle_file_upload)],
     states={

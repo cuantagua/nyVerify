@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from telegram.ext import Application, CommandHandler
 from bot.config import API_TOKEN
-from bot.handlers.user_handlers import user_command_handlers, subir_archivo
+from bot.handlers.user_handlers import user_command_handlers, file_upload_conversation, subir_archivo
 from bot.handlers.admin_handlers import admin_command_handlers
 
 async def start(update, context):
