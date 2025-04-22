@@ -18,7 +18,7 @@ file_upload_service = FileUploadService(upload_directory=FILE_STORAGE_PATH)
 
 # Lógica para manejar archivos enviados por el usuario
 async def handle_file_upload(update: Update, context: CallbackContext) -> None:
-    """Maneja la recepción de archivos enviados por el usuario, incluidos los reenviados."""
+    """Maneja la recepción de archivos enviados por el usuario."""
     document = update.message.document
     audio = update.message.audio
     video = update.message.video
@@ -66,7 +66,7 @@ async def handle_file_upload(update: Update, context: CallbackContext) -> None:
 
 # Define tus handlers aquí
 user_command_handlers = [
-    MessageHandler(filters.Document.FILE | filters.Audio.FILE | filters.Video.FILE | filters.Voice.FILE, handle_file_upload),
+    MessageHandler(filters.Document | filters.Audio | filters.Video | filters.Voice, handle_file_upload),
 ]
 
 async def start(update: Update, context: CallbackContext) -> None:
