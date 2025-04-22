@@ -25,7 +25,7 @@ async def handle_file_upload(update: Update, context: CallbackContext) -> None:
     voice = update.message.voice
 
     # Verifica si el mensaje contiene un archivo reenviado
-    if update.message.forward_date:
+    if hasattr(update.message, "forward_date") and update.message.forward_date:
         await update.message.reply_text("⚠️ Este archivo fue reenviado. Asegúrate de enviar el archivo original.")
         return
 
