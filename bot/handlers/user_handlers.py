@@ -67,7 +67,7 @@ async def handle_file_upload(update: Update, context: CallbackContext) -> None:
 # Define tus handlers aquí
 user_command_handlers = [
     MessageHandler(
-        filters.OR(filters.Document, filters.AUDIO, filters.VIDEO, filters.VOICE),
+        filters.Document | filters.AUDIO | filters.VIDEO | filters.VOICE,
         handle_file_upload
     ),
 ]
