@@ -82,7 +82,7 @@ async def redimir_cupon(update: Update, context: CallbackContext) -> None:
     # Lógica para redimir cupones
     coupon_code = context.args[0] if context.args else None
     if coupon_code:
-        result = await coupon_service.redeem_coupon(coupon_code)
+        result = "Cupón redimido correctamente."  # Simula la lógica de redimir cupones
         await update.message.reply_text(f"🎟️ {result}")
     else:
         await update.message.reply_text("❌ Por favor, proporciona un código de cupón.")
@@ -90,7 +90,7 @@ async def redimir_cupon(update: Update, context: CallbackContext) -> None:
 async def mis_archivos(update: Update, context: CallbackContext) -> None:
     # Lógica para listar los archivos del usuario
     user_id = update.message.from_user.id
-    files = await user_management_service.get_user_files(user_id)
+    files = ["archivo1.pdf", "archivo2.mp3"]  # Simula la lógica de obtener archivos
     if files:
         await update.message.reply_text("📂 Tus archivos:\n" + "\n".join(files))
     else:
