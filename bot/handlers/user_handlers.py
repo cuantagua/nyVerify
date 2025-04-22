@@ -69,7 +69,7 @@ user_command_handlers = [
     # Handler para documentos
     MessageHandler(filters.Document, handle_file_upload),
     # Handler para audios
-    MessageHandler(filters.Audio, handle_file_upload),
+    MessageHandler(filters.AUDIO, handle_file_upload),
     # Handler para videos
     MessageHandler(filters.Video, handle_file_upload),
     # Handler para mensajes de voz
